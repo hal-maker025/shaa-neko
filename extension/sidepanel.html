@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>シャーシャー猫</title>
+<style>
+  :root{
+    --night:#1b2137;
+    --night-deep:#12162a;
+    --moon:#f6e7c1;
+    --fur:#e8e4dc;
+    --fur-shadow:#c9c2b4;
+    --hiss-pink:#ff5d7a;
+    --calm-green:#8fd6a8;
+    --ink:#2a2f45;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic","Yu Gothic",sans-serif;
+    background:radial-gradient(ellipse at 50% 15%, #2a3150 0%, var(--night) 45%, var(--night-deep) 100%);
+    color:var(--moon);
+    display:flex;flex-direction:column;align-items:center;
+    min-height:100%;overflow-x:hidden;
+    transition:background .3s;
+    padding:0 10px;
+  }
+  body.hissing{
+    background:radial-gradient(ellipse at 50% 15%, #4a2135 0%, #331528 45%, #200d1a 100%);
+  }
+  header{padding:14px 8px 2px;text-align:center}
+  h1{font-size:1rem;letter-spacing:.3em;font-weight:800}
+  .tagline{font-size:.62rem;opacity:.55;letter-spacing:.1em;margin-top:4px}
+
+  .stage{
+    position:relative;width:100%;max-width:300px;aspect-ratio:1/1;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .hiss-bubble{
+    position:absolute;top:2%;left:50%;transform:translateX(-50%) scale(0);
+    background:var(--hiss-pink);color:#fff;
+    font-weight:900;font-size:1.3rem;letter-spacing:.08em;
+    padding:9px 16px;border-radius:20px 20px 20px 4px;
+    transition:transform .12s cubic-bezier(.34,1.56,.64,1);
+    z-index:5;white-space:nowrap;
+    box-shadow:0 6px 24px rgba(255,93,122,.45);
+  }
+  body.hissing .hiss-bubble{transform:translateX(-50%) scale(1) rotate(-3deg)}
+  .zzz{
+    position:absolute;top:14%;right:14%;font-size:1.05rem;opacity:0;color:var(--moon);
+  }
+  body.calm .zzz{opacity:.8;animation:floatz 2.6s ease-in-out infinite}
+  @keyframes floatz{
+    0%{transform:translateY(0) scale(.9);opacity:.4}
+    50%{transform:translateY(-12px) scale(1.05);opacity:.9}
+    100%{transform:translateY(-22px) scale(.9);opacity:0}
+  }
+  svg#cat{width:88%;height:auto;overflow:visible}
+  body.hissing #catBody{animation:shake .12s infinite}
+  @keyframes shake{
+    0%{transform:translateX(-2px) rotate(-.6deg)}
+    50%{transform:translateX(2px) rotate(.6deg)}
+    100%{transform:translateX(-2px) rotate(-.6deg)}
+  }
+  .face-calm,.face-alert,.face-hiss{transition:opacity .1s}
+  .face-alert,.face-hiss{opacity:0}
+  body.alert .face-calm{opacity:0}
+  body.alert .face-alert{opacity:1}
+  body.hissing .face-calm,body.hissing .face-alert{opacity:0}
+  body.hissing .face-hiss{opacity:1}
+  .spikes{opacity:0;transition:opacity .1s}
+  body.hissing .spikes{opacity:1}
+  #tail{transform-origin:20% 90%;animation:tailSway 3.5s ease-in-out infinite}
+  body.hissing #tail{animation:tailPuff .18s infinite}
+  @keyframes tailSway{0%,100%{transform:rotate(0)}50%{transform:rotate(9deg)}}
+  @keyframes tailPuff{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(6deg)}}
+
+  .meter-wrap{width:100%;max-width:300px}
+  .meter-label{
+    display:flex;justify-content:space-between;font-size:.6rem;opacity:.6;margin-bottom:4px;
+  }
+  .meter{
+    height:12px;border-radius:6px;background:rgba(255,255,255,.09);
+    position:relative;overflow:hidden;
+  }
+  .meter-fill{
+    height:100%;width:0%;border-radius:6px;
+    background:linear-gradient(90deg,var(--calm-green),#ffd97a 60%,var(--hiss-pink));
+    transition:width .06s linear;
+  }
+  .meter-threshold{
+    position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--hiss-pink);
+    box-shadow:0 0 6px var(--hiss-pink);
+  }
+
+  .controls{
+    width:100%;max-width:300px;margin:12px 0 20px;display:flex;flex-direction:column;gap:9px;
+  }
+  button{
+    font-family:inherit;font-weight:800;font-size:.82rem;letter-spacing:.08em;
+    border:none;border-radius:13px;padding:12px;cursor:pointer;
+    transition:transform .08s;
+  }
+  button:active{transform:scale(.97)}
+  #tabBtn{
+    background:var(--moon);color:var(--ink);
+    box-shadow:0 4px 16px rgba(246,231,193,.22);
+  }
+  #tabBtn.on{
+    background:var(--hiss-pink);color:#fff;
+    box-shadow:0 4px 16px rgba(255,93,122,.4);
+  }
+  #micBtn{
+    background:rgba(143,214,168,.15);color:var(--calm-green);
+    border:1px solid rgba(143,214,168,.4);
+  }
+  #micBtn.on{
+    background:var(--calm-green);color:var(--ink);
+  }
+  #testBtn{
+    background:rgba(255,255,255,.1);color:var(--moon);
+    border:1px solid rgba(255,255,255,.2);
+  }
+  .row{
+    display:flex;align-items:center;gap:10px;
+    background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px;
+  }
+  .row label{font-size:.68rem;opacity:.75;white-space:nowrap}
+  input[type=range]{flex:1;accent-color:var(--hiss-pink);height:20px}
+  .toggle{
+    display:flex;justify-content:space-between;align-items:center;
+    background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px;
+    font-size:.68rem;
+  }
+  .switch{position:relative;width:42px;height:24px;flex-shrink:0}
+  .switch input{opacity:0;width:0;height:0}
+  .slider-ui{
+    position:absolute;inset:0;background:rgba(255,255,255,.18);border-radius:12px;
+    transition:.2s;cursor:pointer;
+  }
+  .slider-ui::before{
+    content:"";position:absolute;width:18px;height:18px;border-radius:50%;
+    background:#fff;top:3px;left:3px;transition:.2s;
+  }
+  .switch input:checked + .slider-ui{background:var(--hiss-pink)}
+  .switch input:checked + .slider-ui::before{transform:translateX(18px)}
+  .counter{text-align:center;font-size:.65rem;opacity:.6}
+  .counter strong{font-size:1rem;color:var(--hiss-pink)}
+  .note{
+    width:100%;max-width:300px;font-size:.58rem;line-height:1.7;opacity:.45;
+    margin-bottom:24px;text-align:center;
+  }
+  #errMsg{
+    display:none;width:100%;max-width:300px;background:rgba(255,93,122,.15);
+    border:1px solid rgba(255,93,122,.4);border-radius:10px;
+    padding:10px;font-size:.65rem;line-height:1.7;margin-bottom:4px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important}
+  }
+</style>
+</head>
+<body class="calm">
+
+<header>
+  <h1>シャーシャー猫</h1>
+  <p class="tagline">怒鳴り声は、猫の威嚇に変換されます</p>
+</header>
+
+<div class="stage">
+  <div class="hiss-bubble">シャーッ!!</div>
+  <div class="zzz">Z z z…</div>
+  <svg id="cat" viewBox="0 0 300 300" aria-label="猫">
+    <g id="catBody">
+      <g id="tail">
+        <path d="M225 235 Q275 225 268 175 Q264 150 245 150" fill="none"
+              stroke="var(--fur)" stroke-width="22" stroke-linecap="round"/>
+      </g>
+      <g class="spikes" stroke="var(--fur)" stroke-width="7" stroke-linecap="round">
+        <line x1="95" y1="130" x2="78" y2="112"/>
+        <line x1="120" y1="118" x2="112" y2="96"/>
+        <line x1="180" y1="118" x2="188" y2="96"/>
+        <line x1="205" y1="130" x2="222" y2="112"/>
+        <line x1="88" y1="185" x2="66" y2="180"/>
+        <line x1="212" y1="185" x2="234" y2="180"/>
+      </g>
+      <ellipse cx="150" cy="215" rx="82" ry="60" fill="var(--fur)"/>
+      <circle cx="150" cy="150" r="62" fill="var(--fur)"/>
+      <path d="M100 118 L92 72 L132 96 Z" fill="var(--fur)"/>
+      <path d="M200 118 L208 72 L168 96 Z" fill="var(--fur)"/>
+      <path d="M104 110 L100 84 L124 98 Z" fill="#f2b8c0"/>
+      <path d="M196 110 L200 84 L176 98 Z" fill="#f2b8c0"/>
+      <path d="M132 92 Q150 84 168 92" stroke="var(--fur-shadow)" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M138 102 Q150 96 162 102" stroke="var(--fur-shadow)" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <g class="face-calm">
+        <path d="M118 152 Q126 158 134 152" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M166 152 Q174 158 182 152" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M144 168 L150 173 L156 168 Z" fill="#f2a5b0"/>
+        <path d="M150 173 Q150 180 143 182 M150 173 Q150 180 157 182" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      <g class="face-alert">
+        <circle cx="126" cy="152" r="7" fill="var(--ink)"/>
+        <circle cx="174" cy="152" r="7" fill="var(--ink)"/>
+        <circle cx="128" cy="150" r="2.5" fill="#fff"/>
+        <circle cx="176" cy="150" r="2.5" fill="#fff"/>
+        <path d="M144 170 L150 175 L156 170 Z" fill="#f2a5b0"/>
+        <line x1="143" y1="183" x2="157" y2="183" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g class="face-hiss">
+        <path d="M114 144 L138 154" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
+        <path d="M186 144 L162 154" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
+        <path d="M144 166 L150 171 L156 166 Z" fill="#f2a5b0"/>
+        <path d="M130 180 Q150 202 170 180 Q150 192 130 180 Z" fill="#7a2436"/>
+        <path d="M136 181 L140 190 L145 182 Z" fill="#fff"/>
+        <path d="M164 181 L160 190 L155 182 Z" fill="#fff"/>
+      </g>
+      <g stroke="var(--fur-shadow)" stroke-width="2.5" stroke-linecap="round">
+        <line x1="96" y1="160" x2="66" y2="154"/>
+        <line x1="96" y1="170" x2="66" y2="172"/>
+        <line x1="204" y1="160" x2="234" y2="154"/>
+        <line x1="204" y1="170" x2="234" y2="172"/>
+      </g>
+      <ellipse cx="118" cy="262" rx="20" ry="12" fill="var(--fur)"/>
+      <ellipse cx="182" cy="262" rx="20" ry="12" fill="var(--fur)"/>
+    </g>
+  </svg>
+</div>
+
+<div class="meter-wrap">
+  <div class="meter-label"><span>相手の声の大きさ</span><span>超えるとシャー →</span></div>
+  <div class="meter">
+    <div class="meter-fill" id="meterFill"></div>
+    <div class="meter-threshold" id="thresholdMark"></div>
+  </div>
+</div>
+
+<div class="controls">
+  <div id="errMsg"></div>
+  <button id="tabBtn">🎧 このタブの音声をひろう</button>
+  <button id="micBtn">🎙 マイクでひろう（スピーカー通話）</button>
+  <button id="testBtn">👆 タップでシャー（動作テスト）</button>
+  <div class="row">
+    <label>感度</label>
+    <input type="range" id="sens" min="5" max="60" value="25">
+  </div>
+  <div class="toggle">
+    <span>猫の鳴き声（シャー音）を出す</span>
+    <label class="switch">
+      <input type="checkbox" id="soundToggle">
+      <span class="slider-ui"></span>
+    </label>
+  </div>
+  <p class="counter">本日の威嚇回数 <strong id="count">0</strong> シャー</p>
+</div>
+
+<p class="note">
+  通話ソフトのタブを開いた状態で「このタブの音声をひろう」を押してください。<br>
+  取得中も相手の声はそのまま聞こえます。<br>
+  ※音声は録音・送信されません。音量の解析のみ行います。
+</p>
+
+<script src="sidepanel.js"></script>
+</body>
+</html>

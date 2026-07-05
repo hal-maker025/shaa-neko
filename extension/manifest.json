@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "シャーシャー猫",
+  "version": "1.0.0",
+  "description": "通話相手の怒鳴り声を、猫の威嚇に変換します。音声は録音・送信されず、音量の解析のみ行います。",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "tabCapture",
+    "sidePanel",
+    "activeTab",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_title": "シャーシャー猫を開く"
+  }
+}
